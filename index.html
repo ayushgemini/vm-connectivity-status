@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VM Connectivity &amp; Setup Rollout</title>
+<title>VM Connectivity Architecture</title>
 <style>
 :root {
   --bg: #F4F6F5;
@@ -18,6 +18,8 @@
   --good-soft: #E4F3EA;
   --warn: #C97A1E;
   --warn-soft: #FBEEDD;
+  --neutral: #5B6B66;
+  --neutral-soft: #E9EDEC;
   --font-display: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Consolas, monospace;
   color-scheme: light dark;
@@ -36,6 +38,8 @@
     --good-soft: #13291C;
     --warn: #E9A23D;
     --warn-soft: #2C2013;
+    --neutral: #9DB3AB;
+    --neutral-soft: #182722;
   }
 }
 * { box-sizing: border-box; }
@@ -46,17 +50,18 @@ body {
   font-family: var(--font-display);
   font-size: 16px;
   line-height: 1.6;
+  scroll-behavior: smooth;
 }
-.page { max-width: 780px; margin: 0 auto; padding: 56px 24px 80px; }
+.page { max-width: 800px; margin: 0 auto; padding: 56px 24px 80px; }
 
 .masthead {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
   gap: 24px;
-  padding-bottom: 24px;
+  padding-bottom: 20px;
   border-bottom: 2px solid var(--ink);
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 .eyebrow {
   font-family: var(--font-mono);
@@ -66,49 +71,38 @@ body {
   color: var(--accent);
   margin: 0 0 10px;
 }
-h1 { font-size: 32px; font-weight: 700; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
-.meta { text-align: right; font-size: 13.5px; color: var(--ink-soft); line-height: 1.55; white-space: nowrap; }
+h1 { font-size: 30px; font-weight: 700; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+.meta { text-align: right; font-size: 13px; color: var(--ink-soft); line-height: 1.55; white-space: nowrap; }
 .meta strong { color: var(--ink); font-weight: 600; }
 
-.done-banner {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  background: var(--good-soft);
-  border: 1px solid color-mix(in srgb, var(--good) 35%, var(--border));
-  border-left: 4px solid var(--good);
-  border-radius: 8px;
-  padding: 16px 20px;
-  margin-bottom: 28px;
+.quicknav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 36px; }
+.quicknav a {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-decoration: none;
+  color: var(--ink-soft);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 6px 13px;
 }
-.done-banner .check {
-  flex: none; width: 34px; height: 34px; border-radius: 50%;
-  background: var(--good); color: var(--surface);
-  display: flex; align-items: center; justify-content: center;
-}
-.done-banner strong { display: block; font-size: 15.5px; color: var(--good); }
-.done-banner span { font-size: 13.5px; color: var(--ink-soft); }
+.quicknav a:hover { color: var(--accent); border-color: var(--accent); }
 
-.status-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 40px; }
-.status-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
-.status-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); margin: 0 0 8px; }
-.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; padding: 4px 10px 4px 8px; border-radius: 100px; }
+.status-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 40px; }
+.status-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 15px 16px; }
+.status-label { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); margin: 0 0 8px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; padding: 4px 10px 4px 8px; border-radius: 100px; }
 .pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex: none; }
 .pill.good { background: var(--good-soft); color: var(--good); }
 .pill.warn { background: var(--warn-soft); color: var(--warn); }
-.status-note { margin: 10px 0 0; font-size: 13px; color: var(--ink-soft); }
+.pill.neutral { background: var(--neutral-soft); color: var(--neutral); }
+.status-note { margin: 10px 0 0; font-size: 12.5px; color: var(--ink-soft); }
 
-section { margin-bottom: 40px; }
+section { margin-bottom: 44px; scroll-margin-top: 24px; }
 h2 { font-size: 20px; font-weight: 700; margin: 0 0 6px; text-wrap: balance; }
-.section-sub { color: var(--ink-soft); font-size: 14.5px; margin: 0 0 20px; max-width: 62ch; }
+.section-sub { color: var(--ink-soft); font-size: 14.5px; margin: 0 0 20px; max-width: 64ch; }
 p { max-width: 68ch; }
-.tok { font-family: var(--font-mono); font-size: 0.92em; background: var(--surface-2); border-radius: 4px; padding: 0.1em 0.4em; }
-
-.feature-grid { display: grid; gap: 14px; }
-.feature { display: grid; grid-template-columns: 40px 1fr; gap: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
-.feature-icon { width: 40px; height: 40px; border-radius: 8px; background: var(--accent-soft); color: var(--accent); display: flex; align-items: center; justify-content: center; }
-.feature h3 { font-size: 15.5px; font-weight: 600; margin: 2px 0 4px; }
-.feature p { font-size: 14px; color: var(--ink-soft); margin: 0; }
+.tok { font-family: var(--font-mono); font-size: 0.9em; background: var(--surface-2); border-radius: 4px; padding: 0.1em 0.4em; }
 
 .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; counter-reset: step; }
 .flow-step { position: relative; padding: 20px 16px 0; border-top: 2px solid var(--border); }
@@ -122,9 +116,37 @@ p { max-width: 68ch; }
 .flow-step p { font-size: 13px; color: var(--ink-soft); margin: 0; }
 .flow-step .tok { display: inline-block; margin-top: 6px; }
 
-.reset-row { display: flex; gap: 16px; align-items: stretch; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; }
-.reset-row .gpio-badge { flex: none; width: 84px; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-weight: 600; font-size: 15px; background: var(--accent-soft); color: var(--accent); border-radius: 8px; }
-.reset-row .reset-copy p { font-size: 14px; margin: 4px 0; color: var(--ink-soft); }
+.deep-dive { display: flex; flex-direction: column; gap: 10px; }
+.dd-item { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.dd-item summary {
+  list-style: none; cursor: pointer;
+  display: grid; grid-template-columns: 34px 1fr 18px; align-items: center; gap: 12px;
+  padding: 14px 16px;
+}
+.dd-item summary::-webkit-details-marker { display: none; }
+.dd-num {
+  font-family: var(--font-mono); font-size: 13px; font-weight: 600;
+  color: var(--accent); background: var(--accent-soft);
+  width: 34px; height: 34px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+}
+.dd-heading h3 { font-size: 15px; font-weight: 600; margin: 0 0 2px; }
+.dd-heading span { font-size: 12.5px; color: var(--ink-soft); }
+.dd-chev { color: var(--ink-soft); transition: transform 0.15s ease; flex: none; }
+.dd-item[open] .dd-chev { transform: rotate(180deg); }
+.dd-body { padding: 0 16px 18px 62px; font-size: 13.8px; color: var(--ink-soft); }
+.dd-body p { margin: 0 0 10px; max-width: 62ch; }
+.dd-body ul { margin: 0 0 10px; padding-left: 18px; }
+.dd-body li { margin-bottom: 6px; max-width: 60ch; }
+.dd-body p:last-child, .dd-body ul:last-child { margin-bottom: 0; }
+
+.reset-row { display: flex; gap: 16px; align-items: stretch; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+.reset-row .gpio-badge {
+  flex: none; width: 84px; display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-mono); font-weight: 600; font-size: 15px;
+  background: var(--accent-soft); color: var(--accent); border-radius: 8px;
+}
+.reset-row .reset-copy p { font-size: 13.5px; margin: 4px 0; color: var(--ink-soft); }
 .reset-row .reset-copy strong { color: var(--ink); }
 
 .video-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 14px; }
@@ -142,14 +164,13 @@ p { max-width: 68ch; }
 .timeline-card .tl-owner { display: flex; align-items: center; justify-content: space-between; }
 .timeline-card .tl-owner strong { font-size: 14.5px; }
 .timeline-card .tl-current { font-size: 14px; color: var(--ink); background: var(--surface-2); border-radius: 6px; padding: 10px 12px; min-height: 1.4em; }
-.timeline-card .tl-updated { font-size: 11.5px; color: var(--ink-soft); font-family: var(--font-mono); }
 
 footer { border-top: 1px solid var(--border); padding-top: 20px; font-size: 12.5px; color: var(--ink-soft); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
 
 @media (max-width: 640px) {
   .masthead { flex-direction: column; align-items: flex-start; }
   .meta { text-align: left; }
-  .status-strip { grid-template-columns: 1fr; }
+  .status-strip { grid-template-columns: 1fr 1fr; }
   .flow { grid-template-columns: 1fr; }
   .flow-step { border-top: none; border-left: 2px solid var(--border); padding: 0 0 20px 22px; }
   .flow-step::before { top: -2px; left: -14px; }
@@ -157,6 +178,7 @@ footer { border-top: 1px solid var(--border); padding-top: 20px; font-size: 12.5
   .reset-row .gpio-badge { width: 100%; height: 44px; }
   .video-grid { grid-template-columns: 1fr; }
   .timeline-grid { grid-template-columns: 1fr; }
+  .dd-body { padding-left: 16px; }
 }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -167,95 +189,141 @@ footer { border-top: 1px solid var(--border); padding-top: 20px; font-size: 12.5
 
   <div class="masthead">
     <div>
-      <p class="eyebrow">Implementation &amp; Status Note</p>
-      <h1>VM Connectivity &amp; Setup Rollout</h1>
+      <p class="eyebrow">Technical Implementation Note</p>
+      <h1>VM Connectivity Architecture</h1>
     </div>
     <div class="meta">
       <div><strong>Machine:</strong> Sanitary Napkin VM (ESP32-S3)</div>
       <div><strong>Date:</strong> 17 Sep 2026</div>
-      <div><strong>Written end-to-end by:</strong> Ayush Rastogi, CTO</div>
+      <div><strong>Author:</strong> Ayush Rastogi</div>
     </div>
   </div>
 
-  <div class="done-banner">
-    <div class="check">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-    </div>
-    <div>
-      <strong>Firmware development is complete, end-to-end — written and validated by the CTO directly.</strong>
-      <span>Everything remaining below sits with the Hardware and QA teams, not Software.</span>
-    </div>
-  </div>
+  <nav class="quicknav">
+    <a href="#overview">Overview</a>
+    <a href="#architecture">Architecture</a>
+    <a href="#setup">Setup Flow</a>
+    <a href="#demo">Recordings</a>
+    <a href="#limitation">Limitation</a>
+    <a href="#status">Status</a>
+  </nav>
 
   <div class="status-strip">
     <div class="status-card">
-      <p class="status-label">Software</p>
-      <span class="pill good">Complete</span>
-      <p class="status-note">Wi-Fi + Cellular, setup portal, reset button — all built and validated.</p>
+      <p class="status-label">Development</p>
+      <span class="pill good">Done</span>
+      <p class="status-note">Dual connectivity, provisioning, state machine, reset — built and bench-tested.</p>
     </div>
     <div class="status-card">
-      <p class="status-label">Hardware — Antenna</p>
-      <span class="pill warn">Improved, not prod-ready</span>
-      <p class="status-note">Current antenna is better than before, still not reliable enough to ship.</p>
+      <p class="status-label">Bench Sanity</p>
+      <span class="pill good">Done</span>
+      <p class="status-note">Full auth → inventory → order → dispense verified on both Wi-Fi and cellular.</p>
     </div>
     <div class="status-card">
-      <p class="status-label">QA Sanity</p>
-      <span class="pill warn">Blocked on hardware</span>
-      <p class="status-note">Waiting on production-antenna machine before a full pass.</p>
+      <p class="status-label">Known Limitation</p>
+      <span class="pill warn">Investigating</span>
+      <p class="status-note">SIM data is slower than expected. Cause unconfirmed — H/W checking, antenna is one suspect.</p>
+    </div>
+    <div class="status-card">
+      <p class="status-label">Production QA</p>
+      <span class="pill neutral">Pending</span>
+      <p class="status-note">Needs the firmware running in an actual production machine setup first.</p>
     </div>
   </div>
 
-  <section>
-    <h2>What this covers</h2>
-    <p>The vending machine's firmware now supports going online over <strong>either Wi-Fi or 4G LTE</strong> (SIMCom A7672S modem), with a self-serve first-time setup flow and a physical field-reset button. This note covers what's built, how an installer sets a machine up, proof it works, the one open hardware limitation, and who owns what's left.</p>
+  <section id="overview">
+    <h2>Overview</h2>
+    <p>The vending machine's firmware brings up either <strong>Wi-Fi or 4G LTE</strong> (SIMCom A7672S modem) behind one connectivity layer, adds a self-serve first-time setup flow so a machine never needs a laptop in the field, and adds a physical reset path for re-provisioning. This note explains how each piece works technically, what's been verified, the one open issue, and current status by team.</p>
   </section>
 
-  <section>
-    <h2>What's implemented</h2>
-    <p class="section-sub">All of the below is in firmware today and has been exercised end-to-end against the backend (auth, inventory, order creation) over both Wi-Fi and cellular.</p>
-    <div class="feature-grid">
-      <div class="feature">
-        <div class="feature-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12.5a11 11 0 0 1 14 0"/><path d="M8.5 16a6 6 0 0 1 7 0"/><circle cx="12" cy="19.5" r="1" fill="currentColor" stroke="none"/></svg>
+  <section id="architecture">
+    <h2>Technical architecture</h2>
+    <p class="section-sub">Expand each subsystem for how it's actually implemented.</p>
+    <div class="deep-dive">
+
+      <details class="dd-item" open>
+        <summary>
+          <span class="dd-num">01</span>
+          <span class="dd-heading"><h3>Dual connectivity — network abstraction</h3><span>Wi-Fi and cellular behind one client interface</span></span>
+          <svg class="dd-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        <div class="dd-body">
+          <p>Depending on what was saved during provisioning, the firmware runs one of two client backends behind a single network interface: <span class="tok">WiFiClientSecure</span> over the ESP32's native Wi-Fi stack, or <span class="tok">TinyGsmClientSecure</span> talking to the A7672S over UART at 115200 baud via TinyGSM 0.12.0. Every backend call — auth, inventory, order creation, payment status, vend confirmation — goes through the same request-building code; only the socket implementation underneath changes.</p>
+          <p>Over cellular, the modem exposes up to 10 independent socket ("mux") slots. The HTTPS client and the order-events WebSocket client are pinned to distinct mux indices, so their AT-command responses and unsolicited result codes can't get attributed to the wrong client object — a subtle failure mode that otherwise looks like one API call silently succeeding while a concurrent one times out for no visible reason.</p>
+          <p>A persistent session manager keeps the LTE data session (PDP context) alive across requests instead of tearing it down each time, and checks session health with direct AT queries (<span class="tok">AT+CGATT</span>, <span class="tok">AT+CGACT</span>, <span class="tok">AT+CGPADDR</span>) rather than trusting library-cached state, which can go stale after the first secure connection.</p>
         </div>
-        <div>
-          <h3>Dual connectivity — Wi-Fi or Cellular</h3>
-          <p>Each machine is provisioned to use one or the other. Every backend call (login, inventory, order, payment, vend, fulfil) works identically regardless of which one is active.</p>
+      </details>
+
+      <details class="dd-item">
+        <summary>
+          <span class="dd-num">02</span>
+          <span class="dd-heading"><h3>First-time provisioning — captive portal</h3><span>Hotspot, wildcard DNS, live connection test</span></span>
+          <svg class="dd-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        <div class="dd-body">
+          <p>A new or freshly reset machine boots into an access point (<span class="tok">SNVM-XXXXXX</span>) running a DNS server that answers every query with its own IP — the standard captive-portal trick that auto-launches the setup page on most phones the moment they join.</p>
+          <ul>
+            <li>The portal scans nearby Wi-Fi networks, sorts by signal strength, and flags which are password-protected; a SIM machine gets an APN field instead.</li>
+            <li>Before anything is saved, the firmware actually attempts the connection with what was entered — a wrong password or APN is caught on the spot, not after the installer has driven off.</li>
+            <li>Confirmed settings (network type, credentials, APN, machine passcode) are written to NVS flash under a dedicated namespace, with keys kept under NVS's 15-character key-length limit.</li>
+          </ul>
         </div>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      </details>
+
+      <details class="dd-item">
+        <summary>
+          <span class="dd-num">03</span>
+          <span class="dd-heading"><h3>State machine &amp; display</h3><span>Explicit states, flicker-free redraws</span></span>
+          <svg class="dd-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        <div class="dd-body">
+          <p>The kiosk runs as an explicit state machine — idle, authenticating, inventory check, awaiting payment, dispensing, error, and so on — with every transition logged over serial for field debugging.</p>
+          <p>Each state change resets a display flag so the TFT redraws exactly once per transition. This replaced an earlier timing-window check that could miss the redraw entirely if a network call happened to take a little longer than expected, which showed up as the screen appearing stuck on a stale message like "Authenticating..." even after the machine had moved on.</p>
         </div>
-        <div>
-          <h3>Hotspot-based first-time setup</h3>
-          <p>No app, no cable. A new machine broadcasts its own Wi-Fi network for an installer's phone to join, then walks through the choices below.</p>
+      </details>
+
+      <details class="dd-item">
+        <summary>
+          <span class="dd-num">04</span>
+          <span class="dd-heading"><h3>Motor &amp; dispense control</h3><span>Home-switch feedback, cooldown</span></span>
+          <svg class="dd-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        <div class="dd-body">
+          <p>The dispense motor drives against a physical home switch rather than a fixed timed pulse, so mechanical variance or a partial jam still stops the motor at a known physical position, with a timeout as the hard backstop if the switch is never reached.</p>
+          <p>A cooldown period after each dispense prevents back-to-back activations from a bouncing sensor or a repeated user tap from re-triggering the motor mid-cycle.</p>
         </div>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+      </details>
+
+      <details class="dd-item">
+        <summary>
+          <span class="dd-num">05</span>
+          <span class="dd-heading"><h3>Field reset button</h3><span>GPIO8, 3-second hold, dispense-safe</span></span>
+          <svg class="dd-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        <div class="dd-body">
+          <p>GPIO8 is read with a debounced hold check: three seconds continuously low clears the NVS provisioning namespace and reboots the machine straight back into the setup flow described above — no laptop or reflash needed in the field.</p>
+          <p>The hold is ignored outright while a dispense is in progress, so a reset can never leave the motor or relay in an undefined state mid-cycle.</p>
         </div>
-        <div>
-          <h3>Live connection test before saving</h3>
-          <p>Whatever the installer enters, the firmware actually connects before committing it — a wrong password or APN gets caught on the spot, not after driving away.</p>
+      </details>
+
+      <details class="dd-item">
+        <summary>
+          <span class="dd-num">06</span>
+          <span class="dd-heading"><h3>Order &amp; payment flow</h3><span>WebSocket events + HTTPS REST</span></span>
+          <svg class="dd-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
+        </summary>
+        <div class="dd-body">
+          <p>Real-time order and payment events arrive over a WebSocket channel; authentication, inventory checks, and order creation go over HTTPS REST — both share the connectivity layer in section 01, including cellular session reuse.</p>
+          <p>Timeouts are enforced end-to-end (for example, a bounded payment window), so a dropped connection resolves into a clear on-screen error state instead of the machine hanging indefinitely.</p>
         </div>
-      </div>
-      <div class="feature">
-        <div class="feature-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 14.5-4.5M20 12a8 8 0 0 1-14.5 4.5"/><path d="M18.5 3v4.5H14M5.5 21v-4.5H10"/></svg>
-        </div>
-        <div>
-          <h3>Steady cellular sessions</h3>
-          <p>The modem reuses a healthy LTE data session instead of tearing it down between requests, and only reconnects when it genuinely needs to — no unnecessary drops.</p>
-        </div>
-      </div>
+      </details>
+
     </div>
   </section>
 
-  <section>
+  <section id="setup">
     <h2>Setup flow, as an installer sees it</h2>
-    <p class="section-sub">Runs automatically on a brand-new machine, or any time it's been reset (see below).</p>
+    <p class="section-sub">The user-facing sequence produced by the provisioning subsystem above. Runs on a brand-new machine, or any time it's been field-reset.</p>
     <div class="flow">
       <div class="flow-step">
         <h4>Join the hotspot</h4>
@@ -269,31 +337,24 @@ footer { border-top: 1px solid var(--border); padding-top: 20px; font-size: 12.5
       </div>
       <div class="flow-step">
         <h4>Choose Wi-Fi or SIM</h4>
-        <p>Wi-Fi: pick from a live scan of nearby networks, sorted by signal, locked ones marked. SIM: enter the APN.</p>
+        <p>Wi-Fi: pick from a live scan, sorted by signal, locked ones marked. SIM: enter the APN.</p>
       </div>
       <div class="flow-step">
         <h4>Set passcode &amp; connect</h4>
         <p>Installer sets the machine passcode; firmware tests the connection live, saves only on success, reboots.</p>
       </div>
     </div>
-  </section>
-
-  <section>
-    <h2>Field reset button</h2>
-    <p class="section-sub">For when a machine needs to move sites, switch from Wi-Fi to SIM, or just got its passcode wrong the first time — no laptop or reflash needed.</p>
-    <div class="reset-row">
+    <div class="reset-row" style="margin-top: 14px;">
       <div class="gpio-badge">GPIO8</div>
       <div class="reset-copy">
-        <p><strong>Hold for 3 seconds</strong> — screen shows "Hold to Reset...", then "Resetting..." once it takes.</p>
-        <p>Wipes the saved Wi-Fi/SIM/passcode and drops the machine straight back into the setup flow above.</p>
-        <p>Ignored while the motor is mid-dispense, so a reset can never leave the relay in an unknown state.</p>
+        <p><strong>Field reset:</strong> hold 3 seconds to wipe saved config and re-enter this flow — see section 05 for the implementation.</p>
       </div>
     </div>
   </section>
 
-  <section>
-    <h2>Proof it works</h2>
-    <p class="section-sub">Reference recordings of the setup flow running live on hardware.</p>
+  <section id="demo">
+    <h2>Recorded runs</h2>
+    <p class="section-sub">The setup and connectivity flow captured running on physical hardware.</p>
     <div class="video-grid">
       <div class="video-card">
         <video controls preload="metadata" src="clip1-setup-hotspot.mp4"></video>
@@ -310,30 +371,30 @@ footer { border-top: 1px solid var(--border); padding-top: 20px; font-size: 12.5
     </div>
   </section>
 
-  <section class="callout">
-    <h2>⚠ Open limitation: antenna</h2>
-    <p>After the hardware team's antenna change, cellular signal is noticeably better than before, and auth / inventory / order-creation calls now succeed reliably in bench testing.</p>
-    <p><strong>It's still not strong or consistent enough to ship to production.</strong> This is a hardware limitation, not a firmware one — the connectivity and session-handling logic above is already built to recover from drops; the current antenna just isn't giving it a strong enough signal to hold onto in real deployment conditions.</p>
-    <p>Fix is on the hardware side: swap in the larger antenna used on our production machines.</p>
+  <section id="limitation" class="callout">
+    <h2>⚠ Open limitation: SIM throughput</h2>
+    <p>Over cellular, data throughput is slower than expected in real-world testing — noticeably more so than the same requests over Wi-Fi. Auth, inventory, and order-creation calls do complete, but round-trip times are inconsistent enough that this isn't ready for production yet.</p>
+    <p><strong>The exact cause isn't confirmed.</strong> The connectivity and session-handling logic in section 01 is already built to hold and reuse a session rather than reconnect unnecessarily, so this looks like a signal/hardware factor rather than a firmware one — the antenna is the leading suspect, but the hardware team still needs to verify that against other possibilities (module placement, cabling, SIM/carrier itself) before it's confirmed.</p>
+    <p>Owner: Hardware team.</p>
   </section>
 
-  <section>
-    <h2>Pending timeline</h2>
-    <p class="section-sub">Software is done — this is now Hardware's and QA's to close out.</p>
+  <section id="status">
+    <h2>Status by team</h2>
+    <p class="section-sub">Development and bench sanity are done — what's left is Hardware's investigation and QA's production pass.</p>
     <div class="timeline-grid">
       <div class="timeline-card">
         <div class="tl-owner">
-          <strong>Hardware</strong>
-          <span class="tok">Sugandha · H/W</span>
+          <strong>Hardware — SIM/Antenna Investigation</strong>
+          <span class="tok">H/W Team</span>
         </div>
-        <div class="tl-current">Testing the production antenna and reporting back with an ETA.</div>
+        <div class="tl-current">Testing alternate antenna options and reporting back with a root cause and ETA.</div>
       </div>
       <div class="timeline-card">
         <div class="tl-owner">
-          <strong>QA</strong>
+          <strong>QA — Production Sanity</strong>
           <span class="tok">QA Team</span>
         </div>
-        <div class="tl-current">Sanity pass scheduled once a production-antenna machine is handed over.</div>
+        <div class="tl-current">Waiting on a production-setup unit before running the full sanity pass.</div>
       </div>
     </div>
   </section>
