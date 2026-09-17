@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VM Connectivity &amp; Setup Rollout</title>
+<style>
+:root {
+  --bg: #F4F6F5;
+  --surface: #FFFFFF;
+  --surface-2: #E8EDEB;
+  --ink: #10201C;
+  --ink-soft: #4B5F59;
+  --border: #D3DCD8;
+  --accent: #146356;
+  --accent-soft: #E4F0EC;
+  --good: #2F8F5B;
+  --good-soft: #E4F3EA;
+  --warn: #C97A1E;
+  --warn-soft: #FBEEDD;
+  --font-display: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Consolas, monospace;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0B1512;
+    --surface: #111F1B;
+    --surface-2: #16281F;
+    --ink: #E7F1EC;
+    --ink-soft: #9DB3AB;
+    --border: #22352E;
+    --accent: #4FBE9E;
+    --accent-soft: #143028;
+    --good: #52C98A;
+    --good-soft: #13291C;
+    --warn: #E9A23D;
+    --warn-soft: #2C2013;
+  }
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 16px;
+  line-height: 1.6;
+}
+.page { max-width: 780px; margin: 0 auto; padding: 56px 24px 80px; }
+
+.masthead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid var(--ink);
+  margin-bottom: 20px;
+}
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 10px;
+}
+h1 { font-size: 32px; font-weight: 700; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+.meta { text-align: right; font-size: 13.5px; color: var(--ink-soft); line-height: 1.55; white-space: nowrap; }
+.meta strong { color: var(--ink); font-weight: 600; }
+
+.done-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--good-soft);
+  border: 1px solid color-mix(in srgb, var(--good) 35%, var(--border));
+  border-left: 4px solid var(--good);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 28px;
+}
+.done-banner .check {
+  flex: none; width: 34px; height: 34px; border-radius: 50%;
+  background: var(--good); color: var(--surface);
+  display: flex; align-items: center; justify-content: center;
+}
+.done-banner strong { display: block; font-size: 15.5px; color: var(--good); }
+.done-banner span { font-size: 13.5px; color: var(--ink-soft); }
+
+.status-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 40px; }
+.status-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+.status-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); margin: 0 0 8px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; padding: 4px 10px 4px 8px; border-radius: 100px; }
+.pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex: none; }
+.pill.good { background: var(--good-soft); color: var(--good); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.status-note { margin: 10px 0 0; font-size: 13px; color: var(--ink-soft); }
+
+section { margin-bottom: 40px; }
+h2 { font-size: 20px; font-weight: 700; margin: 0 0 6px; text-wrap: balance; }
+.section-sub { color: var(--ink-soft); font-size: 14.5px; margin: 0 0 20px; max-width: 62ch; }
+p { max-width: 68ch; }
+.tok { font-family: var(--font-mono); font-size: 0.92em; background: var(--surface-2); border-radius: 4px; padding: 0.1em 0.4em; }
+
+.feature-grid { display: grid; gap: 14px; }
+.feature { display: grid; grid-template-columns: 40px 1fr; gap: 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+.feature-icon { width: 40px; height: 40px; border-radius: 8px; background: var(--accent-soft); color: var(--accent); display: flex; align-items: center; justify-content: center; }
+.feature h3 { font-size: 15.5px; font-weight: 600; margin: 2px 0 4px; }
+.feature p { font-size: 14px; color: var(--ink-soft); margin: 0; }
+
+.flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; counter-reset: step; }
+.flow-step { position: relative; padding: 20px 16px 0; border-top: 2px solid var(--border); }
+.flow-step::before {
+  counter-increment: step; content: counter(step);
+  position: absolute; top: -15px; left: 16px; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--accent); color: var(--surface); font-family: var(--font-mono); font-size: 13px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+}
+.flow-step h4 { font-size: 14.5px; font-weight: 600; margin: 0 0 6px; }
+.flow-step p { font-size: 13px; color: var(--ink-soft); margin: 0; }
+.flow-step .tok { display: inline-block; margin-top: 6px; }
+
+.reset-row { display: flex; gap: 16px; align-items: stretch; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 18px 20px; }
+.reset-row .gpio-badge { flex: none; width: 84px; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-weight: 600; font-size: 15px; background: var(--accent-soft); color: var(--accent); border-radius: 8px; }
+.reset-row .reset-copy p { font-size: 14px; margin: 4px 0; color: var(--ink-soft); }
+.reset-row .reset-copy strong { color: var(--ink); }
+
+.video-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 14px; }
+.video-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.video-card video { display: block; width: 100%; aspect-ratio: 9/16; object-fit: cover; background: #000; }
+.video-card .video-label { padding: 10px 14px; font-size: 13px; color: var(--ink-soft); }
+
+.callout { background: var(--warn-soft); border: 1px solid color-mix(in srgb, var(--warn) 35%, var(--border)); border-left: 4px solid var(--warn); border-radius: 8px; padding: 18px 20px; }
+.callout h2 { color: var(--warn); font-size: 16.5px; margin: 0 0 8px; }
+.callout p { font-size: 14.5px; margin: 0 0 10px; max-width: 66ch; }
+.callout p:last-child { margin-bottom: 0; }
+
+.timeline-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.timeline-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+.timeline-card .tl-owner { display: flex; align-items: center; justify-content: space-between; }
+.timeline-card .tl-owner strong { font-size: 14.5px; }
+.timeline-card .tl-current { font-size: 14px; color: var(--ink); background: var(--surface-2); border-radius: 6px; padding: 10px 12px; min-height: 1.4em; }
+.timeline-card .tl-updated { font-size: 11.5px; color: var(--ink-soft); font-family: var(--font-mono); }
+
+footer { border-top: 1px solid var(--border); padding-top: 20px; font-size: 12.5px; color: var(--ink-soft); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+
+@media (max-width: 640px) {
+  .masthead { flex-direction: column; align-items: flex-start; }
+  .meta { text-align: left; }
+  .status-strip { grid-template-columns: 1fr; }
+  .flow { grid-template-columns: 1fr; }
+  .flow-step { border-top: none; border-left: 2px solid var(--border); padding: 0 0 20px 22px; }
+  .flow-step::before { top: -2px; left: -14px; }
+  .reset-row { flex-direction: column; }
+  .reset-row .gpio-badge { width: 100%; height: 44px; }
+  .video-grid { grid-template-columns: 1fr; }
+  .timeline-grid { grid-template-columns: 1fr; }
+}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="page">
+
+  <div class="masthead">
+    <div>
+      <p class="eyebrow">Implementation &amp; Status Note</p>
+      <h1>VM Connectivity &amp; Setup Rollout</h1>
+    </div>
+    <div class="meta">
+      <div><strong>Machine:</strong> Sanitary Napkin VM (ESP32-S3)</div>
+      <div><strong>Date:</strong> 17 Sep 2026</div>
+      <div><strong>Written end-to-end by:</strong> Ayush Rastogi, CTO</div>
+    </div>
+  </div>
+
+  <div class="done-banner">
+    <div class="check">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+    </div>
+    <div>
+      <strong>Firmware development is complete, end-to-end — written and validated by the CTO directly.</strong>
+      <span>Everything remaining below sits with the Hardware and QA teams, not Software.</span>
+    </div>
+  </div>
+
+  <div class="status-strip">
+    <div class="status-card">
+      <p class="status-label">Software</p>
+      <span class="pill good">Complete</span>
+      <p class="status-note">Wi-Fi + Cellular, setup portal, reset button — all built and validated.</p>
+    </div>
+    <div class="status-card">
+      <p class="status-label">Hardware — Antenna</p>
+      <span class="pill warn">Improved, not prod-ready</span>
+      <p class="status-note">Current antenna is better than before, still not reliable enough to ship.</p>
+    </div>
+    <div class="status-card">
+      <p class="status-label">QA Sanity</p>
+      <span class="pill warn">Blocked on hardware</span>
+      <p class="status-note">Waiting on production-antenna machine before a full pass.</p>
+    </div>
+  </div>
+
+  <section>
+    <h2>What this covers</h2>
+    <p>The vending machine's firmware now supports going online over <strong>either Wi-Fi or 4G LTE</strong> (SIMCom A7672S modem), with a self-serve first-time setup flow and a physical field-reset button. This note covers what's built, how an installer sets a machine up, proof it works, the one open hardware limitation, and who owns what's left.</p>
+  </section>
+
+  <section>
+    <h2>What's implemented</h2>
+    <p class="section-sub">All of the below is in firmware today and has been exercised end-to-end against the backend (auth, inventory, order creation) over both Wi-Fi and cellular.</p>
+    <div class="feature-grid">
+      <div class="feature">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12.5a11 11 0 0 1 14 0"/><path d="M8.5 16a6 6 0 0 1 7 0"/><circle cx="12" cy="19.5" r="1" fill="currentColor" stroke="none"/></svg>
+        </div>
+        <div>
+          <h3>Dual connectivity — Wi-Fi or Cellular</h3>
+          <p>Each machine is provisioned to use one or the other. Every backend call (login, inventory, order, payment, vend, fulfil) works identically regardless of which one is active.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        </div>
+        <div>
+          <h3>Hotspot-based first-time setup</h3>
+          <p>No app, no cable. A new machine broadcasts its own Wi-Fi network for an installer's phone to join, then walks through the choices below.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>
+        </div>
+        <div>
+          <h3>Live connection test before saving</h3>
+          <p>Whatever the installer enters, the firmware actually connects before committing it — a wrong password or APN gets caught on the spot, not after driving away.</p>
+        </div>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 14.5-4.5M20 12a8 8 0 0 1-14.5 4.5"/><path d="M18.5 3v4.5H14M5.5 21v-4.5H10"/></svg>
+        </div>
+        <div>
+          <h3>Steady cellular sessions</h3>
+          <p>The modem reuses a healthy LTE data session instead of tearing it down between requests, and only reconnects when it genuinely needs to — no unnecessary drops.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Setup flow, as an installer sees it</h2>
+    <p class="section-sub">Runs automatically on a brand-new machine, or any time it's been reset (see below).</p>
+    <div class="flow">
+      <div class="flow-step">
+        <h4>Join the hotspot</h4>
+        <p>Machine broadcasts its own network.</p>
+        <span class="tok">SNVM-XXXXXX</span>
+      </div>
+      <div class="flow-step">
+        <h4>Portal opens</h4>
+        <p>Auto-pops on most phones, or open manually.</p>
+        <span class="tok">192.168.4.1</span>
+      </div>
+      <div class="flow-step">
+        <h4>Choose Wi-Fi or SIM</h4>
+        <p>Wi-Fi: pick from a live scan of nearby networks, sorted by signal, locked ones marked. SIM: enter the APN.</p>
+      </div>
+      <div class="flow-step">
+        <h4>Set passcode &amp; connect</h4>
+        <p>Installer sets the machine passcode; firmware tests the connection live, saves only on success, reboots.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Field reset button</h2>
+    <p class="section-sub">For when a machine needs to move sites, switch from Wi-Fi to SIM, or just got its passcode wrong the first time — no laptop or reflash needed.</p>
+    <div class="reset-row">
+      <div class="gpio-badge">GPIO8</div>
+      <div class="reset-copy">
+        <p><strong>Hold for 3 seconds</strong> — screen shows "Hold to Reset...", then "Resetting..." once it takes.</p>
+        <p>Wipes the saved Wi-Fi/SIM/passcode and drops the machine straight back into the setup flow above.</p>
+        <p>Ignored while the motor is mid-dispense, so a reset can never leave the relay in an unknown state.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Proof it works</h2>
+    <p class="section-sub">Reference recordings of the setup flow running live on hardware.</p>
+    <div class="video-grid">
+      <div class="video-card">
+        <video controls preload="metadata" src="clip1-setup-hotspot.mp4"></video>
+        <p class="video-label">Clip 1 — setup &amp; hotspot connect</p>
+      </div>
+      <div class="video-card">
+        <video controls preload="metadata" src="clip2-wifi-sim-select.mp4"></video>
+        <p class="video-label">Clip 2 — Wi-Fi/SIM selection &amp; connect test</p>
+      </div>
+      <div class="video-card">
+        <video controls preload="metadata" src="clip3-connect-test.mp4"></video>
+        <p class="video-label">Clip 3 — end-to-end connect test</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="callout">
+    <h2>⚠ Open limitation: antenna</h2>
+    <p>After the hardware team's antenna change, cellular signal is noticeably better than before, and auth / inventory / order-creation calls now succeed reliably in bench testing.</p>
+    <p><strong>It's still not strong or consistent enough to ship to production.</strong> This is a hardware limitation, not a firmware one — the connectivity and session-handling logic above is already built to recover from drops; the current antenna just isn't giving it a strong enough signal to hold onto in real deployment conditions.</p>
+    <p>Fix is on the hardware side: swap in the larger antenna used on our production machines.</p>
+  </section>
+
+  <section>
+    <h2>Pending timeline</h2>
+    <p class="section-sub">Software is done — this is now Hardware's and QA's to close out.</p>
+    <div class="timeline-grid">
+      <div class="timeline-card">
+        <div class="tl-owner">
+          <strong>Hardware</strong>
+          <span class="tok">Sugandha · H/W</span>
+        </div>
+        <div class="tl-current">Testing the production antenna and reporting back with an ETA.</div>
+      </div>
+      <div class="timeline-card">
+        <div class="tl-owner">
+          <strong>QA</strong>
+          <span class="tok">QA Team</span>
+        </div>
+        <div class="tl-current">Sanity pass scheduled once a production-antenna machine is handed over.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Sanitary Napkin VM — Firmware</span>
+    <span>Questions: ayush.rastogi@daalchini.co.in</span>
+  </footer>
+
+</div>
+</body>
+</html>
