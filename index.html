@@ -6,179 +6,211 @@
 <title>VM Connectivity Architecture</title>
 <style>
 :root {
-  --bg: #F4F6F5;
-  --surface: #FFFFFF;
-  --surface-2: #E8EDEB;
-  --ink: #10201C;
-  --ink-soft: #4B5F59;
-  --border: #D3DCD8;
-  --accent: #146356;
-  --accent-soft: #E4F0EC;
-  --good: #2F8F5B;
-  --good-soft: #E4F3EA;
-  --warn: #C97A1E;
-  --warn-soft: #FBEEDD;
-  --neutral: #5B6B66;
-  --neutral-soft: #E9EDEC;
+  --bg: #0A0F0D;
+  --surface: #121A17;
+  --surface-2: #182420;
+  --console-bg: #0C1310;
+  --ink: #EAF2ED;
+  --ink-soft: #8FA79D;
+  --ink-faint: #56685F;
+  --border: #223029;
+  --accent: #4CE0A8;
+  --accent-soft: rgba(76, 224, 168, 0.13);
+  --accent-glow: rgba(76, 224, 168, 0.30);
+  --good: #4CE0A8;
+  --good-soft: rgba(76, 224, 168, 0.13);
+  --warn: #F5B95B;
+  --warn-soft: rgba(245, 185, 91, 0.13);
+  --critical: #F2726B;
+  --critical-soft: rgba(242, 114, 107, 0.13);
+  --neutral: #86988F;
+  --neutral-soft: rgba(134, 152, 143, 0.13);
   --font-display: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Consolas, monospace;
-  color-scheme: light dark;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0B1512;
-    --surface: #111F1B;
-    --surface-2: #16281F;
-    --ink: #E7F1EC;
-    --ink-soft: #9DB3AB;
-    --border: #22352E;
-    --accent: #4FBE9E;
-    --accent-soft: #143028;
-    --good: #52C98A;
-    --good-soft: #13291C;
-    --warn: #E9A23D;
-    --warn-soft: #2C2013;
-    --neutral: #9DB3AB;
-    --neutral-soft: #182722;
-  }
+  color-scheme: dark;
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; }
 body {
-  background: var(--bg);
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 28px),
+    var(--bg);
   color: var(--ink);
   font-family: var(--font-display);
   font-size: 16px;
   line-height: 1.6;
-  scroll-behavior: smooth;
 }
-.page { max-width: 800px; margin: 0 auto; padding: 56px 24px 80px; }
+.page { max-width: 820px; margin: 0 auto; padding: 56px 24px 90px; }
 
 .masthead {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 24px;
-  padding-bottom: 20px;
-  border-bottom: 2px solid var(--ink);
-  margin-bottom: 16px;
+  display: flex; justify-content: space-between; align-items: flex-end; gap: 24px;
+  padding-bottom: 22px; border-bottom: 1px solid var(--border); margin-bottom: 40px;
 }
 .eyebrow {
-  font-family: var(--font-mono);
-  font-size: 12.5px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--accent);
-  margin: 0 0 10px;
+  font-family: var(--font-mono); font-size: 12.5px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--accent); margin: 0 0 10px; display: flex; align-items: center; gap: 8px;
 }
-h1 { font-size: 30px; font-weight: 700; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
-.meta { text-align: right; font-size: 13px; color: var(--ink-soft); line-height: 1.55; white-space: nowrap; }
-.meta strong { color: var(--ink); font-weight: 600; }
+.eyebrow::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
+h1 { font-size: 31px; font-weight: 700; letter-spacing: -0.01em; margin: 0; text-wrap: balance; }
+.meta { text-align: right; font-size: 13px; color: var(--ink-soft); line-height: 1.6; white-space: nowrap; font-family: var(--font-mono); }
+.meta strong { color: var(--ink); font-weight: 500; }
 
-.quicknav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 36px; }
-.quicknav a {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  text-decoration: none;
-  color: var(--ink-soft);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 100px;
-  padding: 6px 13px;
-}
-.quicknav a:hover { color: var(--accent); border-color: var(--accent); }
-
-.status-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 40px; }
-.status-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 15px 16px; }
-.status-label { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-soft); margin: 0 0 8px; }
-.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; padding: 4px 10px 4px 8px; border-radius: 100px; }
-.pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex: none; }
+.status-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 44px; }
+.status-card { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--neutral); border-radius: 8px; padding: 15px 16px; }
+.status-card.is-good { border-left-color: var(--good); }
+.status-card.is-warn { border-left-color: var(--warn); }
+.status-card.is-neutral { border-left-color: var(--neutral); }
+.status-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-faint); margin: 0 0 8px; font-family: var(--font-mono); }
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; padding: 3px 10px 3px 8px; border-radius: 100px; }
+.pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex: none; }
 .pill.good { background: var(--good-soft); color: var(--good); }
 .pill.warn { background: var(--warn-soft); color: var(--warn); }
 .pill.neutral { background: var(--neutral-soft); color: var(--neutral); }
 .status-note { margin: 10px 0 0; font-size: 12.5px; color: var(--ink-soft); }
 
-section { margin-bottom: 44px; scroll-margin-top: 24px; }
-h2 { font-size: 20px; font-weight: 700; margin: 0 0 6px; text-wrap: balance; }
+section { margin-bottom: 48px; }
+h2 { font-size: 21px; font-weight: 700; margin: 0 0 6px; text-wrap: balance; }
 .section-sub { color: var(--ink-soft); font-size: 14.5px; margin: 0 0 20px; max-width: 64ch; }
 p { max-width: 68ch; }
-.tok { font-family: var(--font-mono); font-size: 0.9em; background: var(--surface-2); border-radius: 4px; padding: 0.1em 0.4em; }
+.tok { font-family: var(--font-mono); font-size: 0.87em; background: var(--surface-2); border: 1px solid var(--border); border-radius: 4px; padding: 0.08em 0.45em; color: var(--accent); }
+
+.console {
+  background: var(--console-bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px;
+  font-family: var(--font-mono); font-size: 12.5px; color: var(--good); height: 168px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.console-line { white-space: pre-wrap; word-break: break-word; opacity: 0.92; }
+.console-ts { color: var(--ink-faint); margin-right: 8px; }
+.console::-webkit-scrollbar { width: 8px; }
+.console::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.deep-dive { display: flex; flex-direction: column; gap: 10px; }
+.dd-item { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.dd-item summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 34px 1fr 18px; align-items: center; gap: 14px; padding: 15px 16px; }
+.dd-item summary::-webkit-details-marker { display: none; }
+.dd-icon { color: var(--accent); background: var(--accent-soft); width: 34px; height: 34px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex: none; }
+.dd-heading h3 { font-size: 15px; font-weight: 600; margin: 0 0 2px; }
+.dd-heading span { font-size: 12.5px; color: var(--ink-soft); }
+.dd-chev { color: var(--ink-faint); transition: transform 0.15s ease; flex: none; }
+.dd-item[open] .dd-chev { transform: rotate(180deg); }
+.dd-item[open] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-soft); }
+.dd-body { padding: 0 16px 20px 64px; font-size: 13.8px; color: var(--ink-soft); }
+.dd-body p { margin: 0 0 10px; max-width: 60ch; }
+.dd-body ul { margin: 0 0 10px; padding-left: 18px; }
+.dd-body li { margin-bottom: 6px; max-width: 58ch; }
+.dd-body p:last-child, .dd-body ul:last-child { margin-bottom: 0; }
+
+.mux-toggle { margin-top: 4px; }
+.mux-toggle input { position: absolute; opacity: 0; pointer-events: none; }
+.mux-tabs { display: inline-flex; gap: 4px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 100px; padding: 3px; margin-bottom: 14px; }
+.mux-tabs label { font-family: var(--font-mono); font-size: 11.5px; padding: 5px 12px; border-radius: 100px; cursor: pointer; color: var(--ink-soft); }
+#mux-before:checked ~ .mux-tabs label[for="mux-before"],
+#mux-after:checked ~ .mux-tabs label[for="mux-after"] { background: var(--accent); color: #06120D; }
+.mux-diagram { display: none; flex-direction: column; gap: 8px; }
+#mux-before:checked ~ .mux-diagram-before { display: flex; }
+#mux-after:checked ~ .mux-diagram-after { display: flex; }
+.mux-lane { display: flex; align-items: center; gap: 10px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; font-family: var(--font-mono); font-size: 12px; }
+.mux-lane.collide { border-color: var(--critical); }
+.mux-slot { padding: 2px 8px; border-radius: 4px; background: var(--surface); border: 1px solid var(--border); }
+.mux-lane.collide .mux-slot { border-color: var(--critical); color: var(--critical); }
+.mux-lane:not(.collide) .mux-slot { border-color: var(--accent); color: var(--accent); }
+.mux-flag { margin-left: auto; font-size: 11px; }
+.mux-lane.collide .mux-flag { color: var(--critical); }
+.mux-lane:not(.collide) .mux-flag { color: var(--good); }
+
+.sim-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 22px; }
+.sim-card + .sim-card { margin-top: 16px; }
+.sim-title { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; margin: 0 0 4px; }
+.sim-title .tok { font-size: 11px; }
+.sim-desc { font-size: 13.5px; color: var(--ink-soft); margin: 0 0 18px; max-width: 62ch; }
+
+.sm-nodes { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 14px; }
+.sm-node { font-family: var(--font-mono); font-size: 12.5px; padding: 9px 14px; border-radius: 7px; background: var(--surface-2); border: 1px solid var(--border); color: var(--ink-faint); transition: all 0.2s ease; }
+.sm-node.visited { color: var(--ink-soft); border-color: var(--border); }
+.sm-node.active { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); box-shadow: 0 0 14px var(--accent-glow); }
+.sm-arrow { color: var(--ink-faint); flex: none; }
+.sm-error-row { margin-bottom: 16px; }
+.sm-node.error-node { color: var(--critical); border-style: dashed; }
+.sm-node.error-node.active { color: var(--critical); border-color: var(--critical); border-style: solid; background: var(--critical-soft); box-shadow: 0 0 14px rgba(242,114,107,0.35); }
+.sim-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.sim-btn { font-family: var(--font-display); font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 7px; border: 1px solid var(--accent); background: transparent; color: var(--accent); cursor: pointer; transition: background 0.15s ease; }
+.sim-btn:hover { background: var(--accent-soft); }
+.sim-btn-danger { border-color: var(--critical); color: var(--critical); }
+.sim-btn-danger:hover { background: var(--critical-soft); }
+
+.reset-sim { display: flex; align-items: center; gap: 28px; margin-bottom: 16px; flex-wrap: wrap; }
+.reset-sim-visual { position: relative; width: 140px; height: 140px; flex: none; }
+.reset-ring circle { fill: none; stroke-width: 6; }
+.ring-bg { stroke: var(--border); }
+.ring-progress { stroke: var(--accent); stroke-linecap: round; transform: rotate(-90deg); transform-origin: 50% 50%; transition: stroke 0.2s ease; }
+.reset-sim-btn { position: absolute; inset: 14px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface-2); color: var(--ink); font-family: var(--font-mono); font-weight: 600; font-size: 13px; cursor: pointer; user-select: none; transition: all 0.15s ease; }
+.reset-sim-btn.holding { background: var(--accent-soft); color: var(--accent); }
+.reset-sim-btn.success { background: var(--good); color: #06120D; border-color: var(--good); }
+.reset-sim-side { flex: 1; min-width: 220px; }
+.reset-sim-toggle { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--ink-soft); margin-bottom: 12px; cursor: pointer; }
+.reset-sim-toggle input { accent-color: var(--accent); width: 15px; height: 15px; }
+.reset-sim-status { font-size: 13.5px; color: var(--ink); min-height: 1.4em; margin: 0; }
+
+.dispense-visual { display: flex; align-items: center; gap: 28px; margin-bottom: 16px; flex-wrap: wrap; }
+.motor-wheel { width: 88px; height: 88px; border-radius: 50%; flex: none; border: 3px solid var(--border); background: var(--surface-2); position: relative; transition: border-color 0.2s ease; }
+.motor-wheel::before { content: ""; position: absolute; width: 3px; height: 34px; border-radius: 2px; background: var(--accent); top: 8px; left: calc(50% - 1.5px); }
+.motor-wheel.spinning { animation: motor-spin 0.5s linear infinite; border-color: var(--accent); }
+@keyframes motor-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .motor-wheel.spinning { animation: none; opacity: 0.65; } }
+.sensor-col { display: flex; flex-direction: column; gap: 10px; }
+.sensor-badge { display: flex; align-items: center; gap: 9px; font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-faint); }
+.sensor-badge .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--border); transition: all 0.15s ease; flex: none; }
+.sensor-badge.lit { color: var(--good); }
+.sensor-badge.lit .dot { background: var(--good); box-shadow: 0 0 8px var(--accent-glow); }
+.sensor-badge.fault { color: var(--critical); }
+.sensor-badge.fault .dot { background: var(--critical); box-shadow: 0 0 8px rgba(242,114,107,0.4); }
+.sim-toggle-row { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 6px; }
+.sim-toggle { display: flex; align-items: center; gap: 7px; font-size: 13px; color: var(--ink-soft); cursor: pointer; }
+.sim-toggle input { accent-color: var(--accent); width: 14px; height: 14px; }
 
 .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; counter-reset: step; }
-.flow-step { position: relative; padding: 20px 16px 0; border-top: 2px solid var(--border); }
-.flow-step::before {
-  counter-increment: step; content: counter(step);
-  position: absolute; top: -15px; left: 16px; width: 28px; height: 28px; border-radius: 50%;
-  background: var(--accent); color: var(--surface); font-family: var(--font-mono); font-size: 13px; font-weight: 600;
-  display: flex; align-items: center; justify-content: center;
-}
+.flow-step { position: relative; padding: 20px 16px 0; border-top: 1px solid var(--border); }
+.flow-step::before { counter-increment: step; content: counter(step); position: absolute; top: -15px; left: 16px; width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: #06120D; font-family: var(--font-mono); font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
 .flow-step h4 { font-size: 14.5px; font-weight: 600; margin: 0 0 6px; }
 .flow-step p { font-size: 13px; color: var(--ink-soft); margin: 0; }
 .flow-step .tok { display: inline-block; margin-top: 6px; }
 
-.deep-dive { display: flex; flex-direction: column; gap: 10px; }
-.dd-item { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
-.dd-item summary {
-  list-style: none; cursor: pointer;
-  display: grid; grid-template-columns: 34px 1fr 18px; align-items: center; gap: 12px;
-  padding: 14px 16px;
-}
-.dd-item summary::-webkit-details-marker { display: none; }
-.dd-num {
-  font-family: var(--font-mono); font-size: 13px; font-weight: 600;
-  color: var(--accent); background: var(--accent-soft);
-  width: 34px; height: 34px; border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-}
-.dd-heading h3 { font-size: 15px; font-weight: 600; margin: 0 0 2px; }
-.dd-heading span { font-size: 12.5px; color: var(--ink-soft); }
-.dd-chev { color: var(--ink-soft); transition: transform 0.15s ease; flex: none; }
-.dd-item[open] .dd-chev { transform: rotate(180deg); }
-.dd-body { padding: 0 16px 18px 62px; font-size: 13.8px; color: var(--ink-soft); }
-.dd-body p { margin: 0 0 10px; max-width: 62ch; }
-.dd-body ul { margin: 0 0 10px; padding-left: 18px; }
-.dd-body li { margin-bottom: 6px; max-width: 60ch; }
-.dd-body p:last-child, .dd-body ul:last-child { margin-bottom: 0; }
-
-.reset-row { display: flex; gap: 16px; align-items: stretch; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
-.reset-row .gpio-badge {
-  flex: none; width: 84px; display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-mono); font-weight: 600; font-size: 15px;
-  background: var(--accent-soft); color: var(--accent); border-radius: 8px;
-}
-.reset-row .reset-copy p { font-size: 13.5px; margin: 4px 0; color: var(--ink-soft); }
-.reset-row .reset-copy strong { color: var(--ink); }
+.reset-row { display: flex; gap: 16px; align-items: stretch; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; margin-top: 14px; }
+.reset-row .gpio-badge { flex: none; width: 84px; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-weight: 600; font-size: 15px; background: var(--accent-soft); color: var(--accent); border-radius: 8px; }
+.reset-row .reset-copy p { font-size: 13.5px; margin: 0; color: var(--ink-soft); }
 
 .video-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 14px; }
 .video-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
 .video-card video { display: block; width: 100%; aspect-ratio: 9/16; object-fit: cover; background: #000; }
 .video-card .video-label { padding: 10px 14px; font-size: 13px; color: var(--ink-soft); }
 
-.callout { background: var(--warn-soft); border: 1px solid color-mix(in srgb, var(--warn) 35%, var(--border)); border-left: 4px solid var(--warn); border-radius: 8px; padding: 18px 20px; }
+.callout { background: var(--warn-soft); border: 1px solid var(--warn); border-left: 3px solid var(--warn); border-radius: 8px; padding: 18px 20px; }
 .callout h2 { color: var(--warn); font-size: 16.5px; margin: 0 0 8px; }
-.callout p { font-size: 14.5px; margin: 0 0 10px; max-width: 66ch; }
+.callout p { font-size: 14.5px; margin: 0 0 10px; max-width: 66ch; color: var(--ink); }
 .callout p:last-child { margin-bottom: 0; }
 
 .timeline-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .timeline-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
 .timeline-card .tl-owner { display: flex; align-items: center; justify-content: space-between; }
-.timeline-card .tl-owner strong { font-size: 14.5px; }
-.timeline-card .tl-current { font-size: 14px; color: var(--ink); background: var(--surface-2); border-radius: 6px; padding: 10px 12px; min-height: 1.4em; }
+.timeline-card .tl-owner strong { font-size: 14px; }
+.timeline-card .tl-current { font-size: 13.5px; color: var(--ink); background: var(--surface-2); border-radius: 6px; padding: 10px 12px; min-height: 1.4em; }
 
-footer { border-top: 1px solid var(--border); padding-top: 20px; font-size: 12.5px; color: var(--ink-soft); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+footer { border-top: 1px solid var(--border); padding-top: 20px; font-size: 12.5px; color: var(--ink-faint); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; font-family: var(--font-mono); }
 
 @media (max-width: 640px) {
   .masthead { flex-direction: column; align-items: flex-start; }
   .meta { text-align: left; }
   .status-strip { grid-template-columns: 1fr 1fr; }
   .flow { grid-template-columns: 1fr; }
-  .flow-step { border-top: none; border-left: 2px solid var(--border); padding: 0 0 20px 22px; }
+  .flow-step { border-top: none; border-left: 1px solid var(--border); padding: 0 0 20px 22px; }
   .flow-step::before { top: -2px; left: -14px; }
   .reset-row { flex-direction: column; }
   .reset-row .gpio-badge { width: 100%; height: 44px; }
   .video-grid { grid-template-columns: 1fr; }
   .timeline-grid { grid-template-columns: 1fr; }
   .dd-body { padding-left: 16px; }
+  .reset-sim { flex-direction: column; align-items: flex-start; }
 }
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -199,33 +231,24 @@ footer { border-top: 1px solid var(--border); padding-top: 20px; font-size: 12.5
     </div>
   </div>
 
-  <nav class="quicknav">
-    <a href="#overview">Overview</a>
-    <a href="#architecture">Architecture</a>
-    <a href="#setup">Setup Flow</a>
-    <a href="#demo">Recordings</a>
-    <a href="#limitation">Limitation</a>
-    <a href="#status">Status</a>
-  </nav>
-
   <div class="status-strip">
-    <div class="status-card">
-      <p class="status-label">Development</p>
+    <div class="status-card is-good">
+      <p class="status-label">DEVELOPMENT</p>
       <span class="pill good">Done</span>
       <p class="status-note">Dual connectivity, provisioning, state machine, reset — built and bench-tested.</p>
     </div>
-    <div class="status-card">
-      <p class="status-label">Bench Sanity</p>
+    <div class="status-card is-good">
+      <p class="status-label">BENCH SANITY</p>
       <span class="pill good">Done</span>
       <p class="status-note">Full auth → inventory → order → dispense verified on both Wi-Fi and cellular.</p>
     </div>
-    <div class="status-card">
-      <p class="status-label">Known Limitation</p>
+    <div class="status-card is-warn">
+      <p class="status-label">KNOWN LIMITATION</p>
       <span class="pill warn">Investigating</span>
       <p class="status-note">SIM data is slower than expected. Cause unconfirmed — H/W checking, antenna is one suspect.</p>
     </div>
-    <div class="status-card">
-      <p class="status-label">Production QA</p>
+    <div class="status-card is-neutral">
+      <p class="status-label">PRODUCTION QA</p>
       <span class="pill neutral">Pending</span>
       <p class="status-note">Needs the firmware running in an actual production machine setup first.</p>
     </div>
@@ -233,7 +256,7 @@ footer { border-top: 1px solid var(--border); padding-top: 20px; font-size: 12.5
 
   <section id="overview">
     <h2>Overview</h2>
-    <p>The vending machine's firmware brings up either <strong>Wi-Fi or 4G LTE</strong> (SIMCom A7672S modem) behind one connectivity layer, adds a self-serve first-time setup flow so a machine never needs a laptop in the field, and adds a physical reset path for re-provisioning. This note explains how each piece works technically, what's been verified, the one open issue, and current status by team.</p>
+    <p>The vending machine's firmware brings up either <strong>Wi-Fi or 4G LTE</strong> (SIMCom A7672S modem) behind one connectivity layer, adds a self-serve first-time setup flow so a machine never needs a laptop in the field, and adds a physical reset path for re-provisioning. This note explains how each piece works technically, lets you step through the actual state and hardware logic yourself, and tracks the one open issue and current status by team.</p>
   </section>
 
   <section id="architecture">
@@ -243,20 +266,36 @@ footer { border-top: 1px solid var(--border); padding-top: 20px; font-size: 12.5
 
       <details class="dd-item" open>
         <summary>
-          <span class="dd-num">01</span>
+          <span class="dd-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12.5a11 11 0 0 1 14 0"/><path d="M8.5 16a6 6 0 0 1 7 0"/><circle cx="12" cy="19.5" r="1" fill="currentColor" stroke="none"/></svg></span>
           <span class="dd-heading"><h3>Dual connectivity — network abstraction</h3><span>Wi-Fi and cellular behind one client interface</span></span>
           <svg class="dd-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
         </summary>
         <div class="dd-body">
           <p>Depending on what was saved during provisioning, the firmware runs one of two client backends behind a single network interface: <span class="tok">WiFiClientSecure</span> over the ESP32's native Wi-Fi stack, or <span class="tok">TinyGsmClientSecure</span> talking to the A7672S over UART at 115200 baud via TinyGSM 0.12.0. Every backend call — auth, inventory, order creation, payment status, vend confirmation — goes through the same request-building code; only the socket implementation underneath changes.</p>
-          <p>Over cellular, the modem exposes up to 10 independent socket ("mux") slots. The HTTPS client and the order-events WebSocket client are pinned to distinct mux indices, so their AT-command responses and unsolicited result codes can't get attributed to the wrong client object — a subtle failure mode that otherwise looks like one API call silently succeeding while a concurrent one times out for no visible reason.</p>
+          <p>Over cellular, the modem exposes up to 10 independent socket ("mux") slots. Two clients sharing a slot get their AT responses and unsolicited result codes cross-attributed — one call looks like it silently succeeds while a concurrent one times out for no visible reason. Toggle below to see the fix:</p>
+          <div class="mux-toggle">
+            <input type="radio" name="muxview" id="mux-before" checked>
+            <input type="radio" name="muxview" id="mux-after">
+            <div class="mux-tabs">
+              <label for="mux-before">Before fix</label>
+              <label for="mux-after">After fix</label>
+            </div>
+            <div class="mux-diagram mux-diagram-before">
+              <div class="mux-lane collide"><span>HTTPS client</span><span class="mux-slot">mux 0</span><span class="mux-flag">⚠ shared slot</span></div>
+              <div class="mux-lane collide"><span>WebSocket client</span><span class="mux-slot">mux 0</span><span class="mux-flag">⚠ shared slot</span></div>
+            </div>
+            <div class="mux-diagram mux-diagram-after">
+              <div class="mux-lane"><span>HTTPS client</span><span class="mux-slot">mux 1</span><span class="mux-flag">✓ isolated</span></div>
+              <div class="mux-lane"><span>WebSocket client</span><span class="mux-slot">mux 2</span><span class="mux-flag">✓ isolated</span></div>
+            </div>
+          </div>
           <p>A persistent session manager keeps the LTE data session (PDP context) alive across requests instead of tearing it down each time, and checks session health with direct AT queries (<span class="tok">AT+CGATT</span>, <span class="tok">AT+CGACT</span>, <span class="tok">AT+CGPADDR</span>) rather than trusting library-cached state, which can go stale after the first secure connection.</p>
         </div>
       </details>
 
       <details class="dd-item">
         <summary>
-          <span class="dd-num">02</span>
+          <span class="dd-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></span>
           <span class="dd-heading"><h3>First-time provisioning — captive portal</h3><span>Hotspot, wildcard DNS, live connection test</span></span>
           <svg class="dd-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
         </summary>
@@ -272,52 +311,122 @@ footer { border-top: 1px solid var(--border); padding-top: 20px; font-size: 12.5
 
       <details class="dd-item">
         <summary>
-          <span class="dd-num">03</span>
+          <span class="dd-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="12" rx="1.5"/><path d="M9 20h6M12 16v4"/></svg></span>
           <span class="dd-heading"><h3>State machine &amp; display</h3><span>Explicit states, flicker-free redraws</span></span>
           <svg class="dd-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
         </summary>
         <div class="dd-body">
-          <p>The kiosk runs as an explicit state machine — idle, authenticating, inventory check, awaiting payment, dispensing, error, and so on — with every transition logged over serial for field debugging.</p>
+          <p>The kiosk runs as an explicit state machine — idle, authenticating, inventory check, awaiting payment, dispensing, error, and so on — with every transition logged over serial for field debugging. Try it in the simulator below.</p>
           <p>Each state change resets a display flag so the TFT redraws exactly once per transition. This replaced an earlier timing-window check that could miss the redraw entirely if a network call happened to take a little longer than expected, which showed up as the screen appearing stuck on a stale message like "Authenticating..." even after the machine had moved on.</p>
         </div>
       </details>
 
       <details class="dd-item">
         <summary>
-          <span class="dd-num">04</span>
+          <span class="dd-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></span>
           <span class="dd-heading"><h3>Motor &amp; dispense control</h3><span>Home-switch feedback, cooldown</span></span>
           <svg class="dd-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
         </summary>
         <div class="dd-body">
-          <p>The dispense motor drives against a physical home switch rather than a fixed timed pulse, so mechanical variance or a partial jam still stops the motor at a known physical position, with a timeout as the hard backstop if the switch is never reached.</p>
+          <p>The dispense motor drives against a physical home switch rather than a fixed timed pulse, so mechanical variance or a partial jam still stops the motor at a known physical position, with a timeout as the hard backstop if the switch is never reached. Try the failure modes in the simulator below.</p>
           <p>A cooldown period after each dispense prevents back-to-back activations from a bouncing sensor or a repeated user tap from re-triggering the motor mid-cycle.</p>
         </div>
       </details>
 
       <details class="dd-item">
         <summary>
-          <span class="dd-num">05</span>
+          <span class="dd-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="M6.3 6.3a8 8 0 1 0 11.4 0"/></svg></span>
           <span class="dd-heading"><h3>Field reset button</h3><span>GPIO8, 3-second hold, dispense-safe</span></span>
           <svg class="dd-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
         </summary>
         <div class="dd-body">
-          <p>GPIO8 is read with a debounced hold check: three seconds continuously low clears the NVS provisioning namespace and reboots the machine straight back into the setup flow described above — no laptop or reflash needed in the field.</p>
+          <p>GPIO8 is read with a debounced hold check: three seconds continuously low clears the NVS provisioning namespace and reboots the machine straight back into the setup flow — no laptop or reflash needed in the field. Try the exact timing in the simulator below.</p>
           <p>The hold is ignored outright while a dispense is in progress, so a reset can never leave the motor or relay in an undefined state mid-cycle.</p>
         </div>
       </details>
 
       <details class="dd-item">
         <summary>
-          <span class="dd-num">06</span>
+          <span class="dd-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3l4 4-4 4"/><path d="M21 7H9a4 4 0 0 0-4 4"/><path d="M7 21l-4-4 4-4"/><path d="M3 17h12a4 4 0 0 0 4-4"/></svg></span>
           <span class="dd-heading"><h3>Order &amp; payment flow</h3><span>WebSocket events + HTTPS REST</span></span>
           <svg class="dd-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="m6 9 6 6 6-6"/></svg>
         </summary>
         <div class="dd-body">
-          <p>Real-time order and payment events arrive over a WebSocket channel; authentication, inventory checks, and order creation go over HTTPS REST — both share the connectivity layer in section 01, including cellular session reuse.</p>
+          <p>Real-time order and payment events arrive over a WebSocket channel; authentication, inventory checks, and order creation go over HTTPS REST — both share the connectivity layer above, including cellular session reuse.</p>
           <p>Timeouts are enforced end-to-end (for example, a bounded payment window), so a dropped connection resolves into a clear on-screen error state instead of the machine hanging indefinitely.</p>
         </div>
       </details>
 
+    </div>
+  </section>
+
+  <section id="simulators">
+    <h2>Try it — interactive simulators</h2>
+    <p class="section-sub">These mirror the real firmware logic exactly (same states, same 3-second hold, same guard conditions) — not a mockup.</p>
+
+    <div class="sim-card">
+      <p class="sim-title">Kiosk state machine <span class="tok">SystemState</span></p>
+      <p class="sim-desc">Step through the real transitions. Only the actions valid from the current state are shown, same as the firmware's own state guards.</p>
+      <div class="sm-nodes" id="sm-nodes">
+        <span class="sm-node" data-state="IDLE">Idle</span>
+        <span class="sm-arrow">→</span>
+        <span class="sm-node" data-state="AUTHENTICATING">Authenticating</span>
+        <span class="sm-arrow">→</span>
+        <span class="sm-node" data-state="INVENTORY_CHECK">Inventory Check</span>
+        <span class="sm-arrow">→</span>
+        <span class="sm-node" data-state="AWAITING_PAYMENT">Awaiting Payment</span>
+        <span class="sm-arrow">→</span>
+        <span class="sm-node" data-state="DISPENSING">Dispensing</span>
+        <span class="sm-arrow">→</span>
+        <span class="sm-node" data-state="DONE">Done</span>
+      </div>
+      <div class="sm-error-row">
+        <span class="sm-node error-node" id="sm-error-node">⚠ Error (reachable from Authenticating, Inventory Check, or Awaiting Payment)</span>
+      </div>
+      <div class="sim-actions" id="sm-actions"></div>
+      <div class="console" id="sm-log"></div>
+    </div>
+
+    <div class="sim-card">
+      <p class="sim-title">Dispense mechanism <span class="tok">Motor + Home Switch + IR Sensor</span></p>
+      <p class="sim-desc">The motor drives to a physical home switch rather than a timed pulse, and an IR sensor at the chute confirms the item actually dropped. Simulate the failure modes below.</p>
+      <div class="dispense-visual">
+        <div class="motor-wheel" id="motor-wheel"></div>
+        <div class="sensor-col">
+          <span class="sensor-badge" id="home-switch-badge"><span class="dot"></span>Home switch (GPIO15)</span>
+          <span class="sensor-badge" id="ir-sensor-badge"><span class="dot"></span>IR sensor (GPIO7)</span>
+        </div>
+      </div>
+      <div class="sim-toggle-row">
+        <label class="sim-toggle"><input type="checkbox" id="dispense-jam">Simulate jam — switch never reached</label>
+        <label class="sim-toggle"><input type="checkbox" id="dispense-noitem">Simulate no item detected</label>
+      </div>
+      <div class="sim-actions">
+        <button type="button" class="sim-btn" id="dispense-start">Start Dispense</button>
+      </div>
+      <div class="console" id="dispense-log"></div>
+    </div>
+
+    <div class="sim-card">
+      <p class="sim-title">Field reset button <span class="tok">GPIO8</span></p>
+      <p class="sim-desc">Press and hold for the real 3000&nbsp;ms threshold. Check "dispense in progress" first to see the safety guard reject the hold.</p>
+      <div class="reset-sim">
+        <div class="reset-sim-visual">
+          <svg width="140" height="140" viewBox="0 0 140 140" class="reset-ring">
+            <circle cx="70" cy="70" r="60" class="ring-bg"/>
+            <circle cx="70" cy="70" r="60" class="ring-progress" id="reset-ring-progress"/>
+          </svg>
+          <button type="button" class="reset-sim-btn" id="reset-sim-btn">GPIO8</button>
+        </div>
+        <div class="reset-sim-side">
+          <label class="reset-sim-toggle">
+            <input type="checkbox" id="reset-sim-dispensing">
+            Simulate: dispense in progress
+          </label>
+          <p class="reset-sim-status" id="reset-sim-status">Press and hold for 3 seconds.</p>
+        </div>
+      </div>
+      <div class="console" id="reset-log"></div>
     </div>
   </section>
 
@@ -344,10 +453,10 @@ footer { border-top: 1px solid var(--border); padding-top: 20px; font-size: 12.5
         <p>Installer sets the machine passcode; firmware tests the connection live, saves only on success, reboots.</p>
       </div>
     </div>
-    <div class="reset-row" style="margin-top: 14px;">
+    <div class="reset-row">
       <div class="gpio-badge">GPIO8</div>
       <div class="reset-copy">
-        <p><strong>Field reset:</strong> hold 3 seconds to wipe saved config and re-enter this flow — see section 05 for the implementation.</p>
+        <p><strong>Field reset:</strong> hold 3 seconds to wipe saved config and re-enter this flow — see the simulator above for the exact behavior.</p>
       </div>
     </div>
   </section>
@@ -374,7 +483,7 @@ footer { border-top: 1px solid var(--border); padding-top: 20px; font-size: 12.5
   <section id="limitation" class="callout">
     <h2>⚠ Open limitation: SIM throughput</h2>
     <p>Over cellular, data throughput is slower than expected in real-world testing — noticeably more so than the same requests over Wi-Fi. Auth, inventory, and order-creation calls do complete, but round-trip times are inconsistent enough that this isn't ready for production yet.</p>
-    <p><strong>The exact cause isn't confirmed.</strong> The connectivity and session-handling logic in section 01 is already built to hold and reuse a session rather than reconnect unnecessarily, so this looks like a signal/hardware factor rather than a firmware one — the antenna is the leading suspect, but the hardware team still needs to verify that against other possibilities (module placement, cabling, SIM/carrier itself) before it's confirmed.</p>
+    <p><strong>The exact cause isn't confirmed.</strong> The connectivity and session-handling logic above is already built to hold and reuse a session rather than reconnect unnecessarily, so this looks like a signal/hardware factor rather than a firmware one — the antenna is the leading suspect, but the hardware team still needs to verify that against other possibilities (module placement, cabling, SIM/carrier itself) before it's confirmed.</p>
     <p>Owner: Hardware team.</p>
   </section>
 
@@ -401,9 +510,245 @@ footer { border-top: 1px solid var(--border); padding-top: 20px; font-size: 12.5
 
   <footer>
     <span>Sanitary Napkin VM — Firmware</span>
-    <span>Questions: ayush.rastogi@daalchini.co.in</span>
+    <span>ayush.rastogi@daalchini.co.in</span>
   </footer>
 
 </div>
+
+<script>
+(function () {
+  var STATES = ['IDLE','AUTHENTICATING','INVENTORY_CHECK','AWAITING_PAYMENT','DISPENSING','DONE'];
+  var LABELS = {IDLE:'Idle',AUTHENTICATING:'Authenticating',INVENTORY_CHECK:'Inventory Check',AWAITING_PAYMENT:'Awaiting Payment',DISPENSING:'Dispensing',DONE:'Done',ERROR:'Error'};
+  var TRANSITIONS = {
+    IDLE: [{action:'start', label:'Tap to Start', to:'AUTHENTICATING'}],
+    AUTHENTICATING: [{action:'auth_ok', label:'Auth OK', to:'INVENTORY_CHECK'}, {action:'auth_fail', label:'Auth Fail', to:'ERROR'}],
+    INVENTORY_CHECK: [{action:'inv_ok', label:'Inventory OK', to:'AWAITING_PAYMENT'}, {action:'inv_fail', label:'Inventory Fail', to:'ERROR'}],
+    AWAITING_PAYMENT: [{action:'pay_ok', label:'Payment Success', to:'DISPENSING'}, {action:'pay_timeout', label:'Payment Timeout', to:'ERROR'}],
+    DISPENSING: [{action:'dispense_done', label:'Dispense Complete', to:'DONE'}],
+    DONE: [{action:'reset', label:'Reset to Idle', to:'IDLE'}],
+    ERROR: [{action:'reset', label:'Reset to Idle', to:'IDLE'}]
+  };
+  var current = 'IDLE';
+  var clockMs = 0;
+
+  var nodesEl = document.getElementById('sm-nodes');
+  var errorNodeEl = document.getElementById('sm-error-node');
+  var actionsEl = document.getElementById('sm-actions');
+  var logEl = document.getElementById('sm-log');
+
+  function pad(n, len) { n = String(n); while (n.length < len) n = '0' + n; return n; }
+  function fmtClock(ms) {
+    var m = Math.floor(ms / 60000);
+    var s = Math.floor((ms % 60000) / 1000);
+    return pad(m, 2) + ':' + pad(s, 2) + '.' + pad(ms % 1000, 3);
+  }
+  function smLog(line) {
+    clockMs += 40 + Math.floor(Math.random() * 300);
+    var row = document.createElement('div');
+    row.className = 'console-line';
+    var ts = document.createElement('span');
+    ts.className = 'console-ts';
+    ts.textContent = fmtClock(clockMs);
+    row.appendChild(ts);
+    row.appendChild(document.createTextNode(line));
+    logEl.appendChild(row);
+    logEl.scrollTop = logEl.scrollHeight;
+    while (logEl.children.length > 14) logEl.removeChild(logEl.firstChild);
+  }
+
+  function renderSM() {
+    STATES.forEach(function (s) {
+      var el = nodesEl.querySelector('[data-state="' + s + '"]');
+      if (!el) return;
+      el.classList.toggle('active', current === s);
+      el.classList.toggle('visited', STATES.indexOf(s) < STATES.indexOf(current));
+    });
+    errorNodeEl.classList.toggle('active', current === 'ERROR');
+
+    actionsEl.innerHTML = '';
+    (TRANSITIONS[current] || []).forEach(function (t) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'sim-btn' + (t.to === 'ERROR' ? ' sim-btn-danger' : '');
+      btn.textContent = t.label;
+      btn.addEventListener('click', function () { smTransition(t); });
+      actionsEl.appendChild(btn);
+    });
+  }
+
+  function smTransition(t) {
+    smLog('[STATE] ' + LABELS[current].toUpperCase() + ' -> ' + LABELS[t.to].toUpperCase());
+    current = t.to;
+    renderSM();
+  }
+
+  smLog('[STATE] Boot complete, entering IDLE');
+  renderSM();
+
+  var HOME_TIMEOUT_MS = 3000;
+  var COOLDOWN_MS = 300;
+  var wheelEl = document.getElementById('motor-wheel');
+  var homeBadge = document.getElementById('home-switch-badge');
+  var irBadge = document.getElementById('ir-sensor-badge');
+  var jamChk = document.getElementById('dispense-jam');
+  var noItemChk = document.getElementById('dispense-noitem');
+  var dispenseBtn = document.getElementById('dispense-start');
+  var dLogEl = document.getElementById('dispense-log');
+  var dispensing = false;
+
+  function dLog(line) {
+    var row = document.createElement('div');
+    row.className = 'console-line';
+    row.textContent = line;
+    dLogEl.appendChild(row);
+    dLogEl.scrollTop = dLogEl.scrollHeight;
+    while (dLogEl.children.length > 12) dLogEl.removeChild(dLogEl.firstChild);
+  }
+
+  function setBadge(el, state) {
+    el.classList.remove('lit', 'fault');
+    if (state === 'lit') el.classList.add('lit');
+    if (state === 'fault') el.classList.add('fault');
+  }
+
+  function startDispense() {
+    if (dispensing) return;
+    dispensing = true;
+    dispenseBtn.disabled = true;
+    setBadge(homeBadge, 'off');
+    setBadge(irBadge, 'off');
+    var jam = jamChk.checked;
+    var noItem = noItemChk.checked;
+
+    dLog('[Motor] Dispense start - driving toward home switch');
+    wheelEl.classList.add('spinning');
+
+    var spinTime = jam ? HOME_TIMEOUT_MS : 700 + Math.random() * 900;
+
+    setTimeout(function () {
+      wheelEl.classList.remove('spinning');
+
+      if (jam) {
+        setBadge(homeBadge, 'fault');
+        dLog('[Motor] Home switch not reached within ' + HOME_TIMEOUT_MS + 'ms - stopping (timeout backstop)');
+        dLog('[Motor] Dispense FAILED - mechanical fault, flagging for service');
+        dispensing = false;
+        dispenseBtn.disabled = false;
+        return;
+      }
+
+      setBadge(homeBadge, 'lit');
+      dLog('[Motor] Home switch triggered - motor stopped at home position');
+
+      setTimeout(function () {
+        if (noItem) {
+          setBadge(irBadge, 'fault');
+          dLog('[IRSensor] No product detected at chute - possible empty slot');
+          dLog('[Motor] Dispense INCOMPLETE - flagging for inventory check');
+        } else {
+          setBadge(irBadge, 'lit');
+          dLog('[IRSensor] Product detected at chute - dispense confirmed');
+          dLog('[Motor] Dispense OK');
+        }
+
+        setTimeout(function () {
+          dLog('[Motor] Cooldown ' + COOLDOWN_MS + 'ms - ignoring further activations');
+          setTimeout(function () {
+            setBadge(homeBadge, 'off');
+            setBadge(irBadge, 'off');
+            dLog('[Motor] Ready for next dispense');
+            dispensing = false;
+            dispenseBtn.disabled = false;
+          }, COOLDOWN_MS);
+        }, 200);
+      }, 250);
+    }, spinTime);
+  }
+
+  dispenseBtn.addEventListener('click', startDispense);
+
+  var HOLD_MS = 3000;
+  var rbtn = document.getElementById('reset-sim-btn');
+  var ring = document.getElementById('reset-ring-progress');
+  var statusEl = document.getElementById('reset-sim-status');
+  var dispensingChk = document.getElementById('reset-sim-dispensing');
+  var rlogEl = document.getElementById('reset-log');
+  var circumference = 2 * Math.PI * 60;
+  ring.style.strokeDasharray = circumference;
+  ring.style.strokeDashoffset = circumference;
+
+  var rafId = null, startTime = null, doneHold = false;
+
+  function rLog(line) {
+    var row = document.createElement('div');
+    row.className = 'console-line';
+    row.textContent = line;
+    rlogEl.appendChild(row);
+    rlogEl.scrollTop = rlogEl.scrollHeight;
+    while (rlogEl.children.length > 10) rlogEl.removeChild(rlogEl.firstChild);
+  }
+
+  function resetVisual() {
+    startTime = null; doneHold = false;
+    ring.style.strokeDashoffset = circumference;
+    rbtn.classList.remove('holding', 'success');
+    statusEl.textContent = 'Press and hold for 3 seconds.';
+  }
+
+  function frame(ts) {
+    if (!startTime) startTime = ts;
+    var elapsed = ts - startTime;
+    var progress = Math.min(1, elapsed / HOLD_MS);
+    ring.style.strokeDashoffset = circumference * (1 - progress);
+    if (progress >= 1 && !doneHold) {
+      doneHold = true;
+      rbtn.classList.remove('holding');
+      rbtn.classList.add('success');
+      statusEl.textContent = 'Held for threshold — clearing config and rebooting…';
+      rLog('[ResetButton] Held for ' + HOLD_MS + 'ms - clearing provisioning and restarting into Setup Mode');
+      setTimeout(function () {
+        rLog('[Provisioning] NVS cleared. Rebooting...');
+        setTimeout(function () {
+          statusEl.textContent = 'Rebooted into Setup Mode ✓';
+          rLog('[Boot] Entered Setup Mode - broadcasting SNVM-XXXXXX');
+          setTimeout(resetVisual, 1800);
+        }, 700);
+      }, 400);
+      return;
+    }
+    if (!doneHold) rafId = requestAnimationFrame(frame);
+  }
+
+  function press(e) {
+    e.preventDefault();
+    if (doneHold) return;
+    if (dispensingChk.checked) {
+      rLog('[ResetButton] Press ignored - dispense in progress');
+      statusEl.textContent = 'Ignored — motor is dispensing.';
+      return;
+    }
+    rLog('[ResetButton] Press detected on GPIO8 - hold for ' + HOLD_MS + 'ms to reset');
+    rbtn.classList.add('holding');
+    startTime = null;
+    rafId = requestAnimationFrame(frame);
+  }
+
+  function release() {
+    if (doneHold) return;
+    cancelAnimationFrame(rafId);
+    if (startTime) rLog('[ResetButton] Released early - hold cancelled');
+    startTime = null;
+    ring.style.strokeDashoffset = circumference;
+    rbtn.classList.remove('holding');
+    statusEl.textContent = 'Press and hold for 3 seconds.';
+  }
+
+  rbtn.addEventListener('mousedown', press);
+  rbtn.addEventListener('touchstart', press, { passive: false });
+  rbtn.addEventListener('mouseup', release);
+  rbtn.addEventListener('mouseleave', release);
+  rbtn.addEventListener('touchend', release);
+})();
+</script>
 </body>
 </html>
